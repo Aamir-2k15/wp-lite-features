@@ -4,7 +4,7 @@
  * Plugin URI: n/a
  * Description: Wp-lite theme additional features
  * Plugin Author: Anonymous
- * Version: 1
+ * Version: 1.1.1
  * Text Domain: wpl_f
  * */
 
@@ -134,16 +134,16 @@ function related_posts($atts)
     ?>
   <div class="row mt-2 pb-5 related <?php echo $category ?>">
       <?php while ($related->have_posts()): $related->the_post();?>
-	          <div class="col-md-4 p-3">
-	              <div class="article post-<?php echo get_the_ID(); ?>"> <a href="<?php echo get_the_permalink(get_the_ID()); ?>">
-	                      <?php if (has_post_thumbnail()) {?>
-	                          <?php $image = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'full');?>
-	                          <img src="<?php echo $image[0]; ?>" class="img-fluid ml-auto mr-auto" width=""/>
-	                      <?php }?>
-	                      <p class="text-center"><?php echo get_the_title(); ?></p>
-	                  </a> </div>
-	          </div>
-	          <?php
+        <div class="col-md-4 p-3">
+            <div class="article post-<?php echo get_the_ID(); ?>"> <a href="<?php echo get_the_permalink(get_the_ID()); ?>">
+                    <?php if (has_post_thumbnail()) {?>
+                        <?php $image = wp_get_attachment_image_src(get_post_thumbnail_id($post->ID), 'full');?>
+                        <img src="<?php echo $image[0]; ?>" class="img-fluid ml-auto mr-auto" width=""/>
+                    <?php }?>
+                    <p class="text-center"><?php echo get_the_title(); ?></p>
+                </a> </div>
+        </div>
+			          <?php
 endwhile;
     wp_reset_postdata();
     ?>
@@ -225,55 +225,196 @@ function colend_shortcode_func()
 
 /** 1. Registration
  * **/
-//add_shortcode('wpl_signup', 'wpl_signup_cb');
+// add_shortcode('wpl_signup', 'wpl_signup_cb');
 
 function wpl_signup_cb()
 {
     ob_start();?>
 <div class="signup-form">
-    <form action="" method="post" id="">
+    <form action="" method="post" id="signup" name="signup">
 		<h2>Register</h2>
 		<p class="hint-text">Create your account. It's free and only takes a minute.</p>
         <div class="form-group">
 			<div class="row">
-				<div class="col"><input type="text" class="form-control" name="first_name" placeholder="First Name" required="required"></div>
-				<div class="col"><input type="text" class="form-control" name="last_name" placeholder="Last Name" required="required"></div>
+				<div class="col"><input type="text" class="form-control" name="first_name" id="first_name" placeholder="First Name"></div>
+				<div class="col"><input type="text" class="form-control" name="last_name" id="last_name" placeholder="Last Name"></div>
 			</div>
         </div>
         <div class="form-group">
-        	<input type="email" class="form-control" name="email" placeholder="Email" required="required">
+        	<input type="email" class="form-control" name="email" placeholder="Email">
         </div>
 		<div class="form-group">
-            <input type="password" class="form-control" name="password" placeholder="Password" required="required">
+            <input type="password" class="form-control" name="password" id="password" placeholder="Password">
         </div>
 		<div class="form-group">
-            <input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password" required="required">
+            <input type="password" class="form-control" name="password_confirm" id="password_confirm" placeholder="Confirm Password">
         </div>
         <div class="form-group">
-			<label class="form-check-label"><input type="checkbox" required="required"> I accept the <a href="#">Terms of Use</a> &amp; <a href="#">Privacy Policy</a></label>
+			<label class="form-check-label"><input type="checkbox" name="terms" id="terms"> I accept the <a href="#">Terms of Use</a> &amp; <a href="#">Privacy Policy</a></label>
 		</div>
 		<div class="form-group">
-            <button type="submit" class="btn btn-success btn-lg btn-block">Register Now</button>
+            <button type="submit" class="btn btn-success btn-lg btn-block" id="signup_btn">Register Now</button>
         </div>
     </form>
 	<div class="text-center">Already have an account? <a href="/signin">Sign in</a></div>
 </div>
-<?php add_action( 'wp_footer', 'signup_script', 24 );
-    function signup_script()
-    {
+<?php add_action('wp_footer', 'signup_script', 24);
+    function signup_script() {
+     ob_start();   
         ?>
+<style>.error{color: #dc3545;}.form-group {    margin-bottom: 1rem;    position: relative;}
+.custom-control-inline label.error {    color: #dc3545;    position: absolute;    top: 2px;    clear: both;    display: block;    width: 202px;    left: 230px;    height: 27px;   margin-bottom:10px;    line-height: 20px;}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
 <script>
   (function ($) {
  $(document).ready(function() {
+
+    $("form[name='signup']").validate({
+
+// Specify validation rules
+rules: {
+    // The key name on the left side is the name attribute
+    // of an input field. Validation rules are defined
+    // on the right side
+
+    first_name: {
+        required: true,
+        minlength: 3
+    },
+    last_name: {
+        required: true,
+        minlength: 3
+    },
+    email: {
+        required: true,
+        // Specify that email should be validated
+        // by the built-in "email" rule
+        email: true
+    },
+    password: {
+        required: true,
+        minlength: 5
+    },
+    password_confirm: {
+        required: true,
+        minlength: 5,
+        equalTo: "#password"
+    },
+    terms: "required",
+},
+// Specify validation error messages
+messages: {
+
+    first_name: {
+        required: "Please provide a username",
+        minlength: "Your username must be at least 5 characters long"
+    },
+    last_name: {
+        required: "Please provide a username",
+        minlength: "Your username must be at least 5 characters long"
+    },
+    password: {
+        required: "Please provide a password",
+        minlength: "Your password must be at least 5 characters long"
+    },
+    email: "Please enter a valid email address"
+},
+// Make sure the form is submitted to the destination defined
+// in the "action" attribute of the form when valid
+submitHandler: function (form) {
+    // form.submit();
+    signup_user(event);
+}
+});
+//validation end
 	console.log('noConf added!');
+
+function signup_user(event){
+    event.preventDefault();
+    noenter();
+    let form_data = $('form#signup').serialize();
+    let the_url = "<?php echo admin_url('admin-ajax.php') ?>?action=register_user";
+    // console.log(form_data);
+    $.ajax({
+            //debugger;
+            url: the_url,
+            type: "post",
+            // dataType: "json",
+            //                    async: false
+            data: form_data,
+            //                    beforeSend: ez_loading_func()
+        }).done(function (response) {
+            // debugger;
+            console.log(response);
+            // if (response.status == 1) {
+                $('form#signup')[0].reset();
+                // $("#response").html(response.response);
+            // }
+        }); //ajax done
+}
+
  });
 })(jQuery);
+
+function noenter() {
+  return !(window.event && window.event.keyCode == 13); }
 </script>
 <?php }?>
 <?php $reg_form = ob_get_clean();
     return $reg_form;
 }
+/////////////////////////////
+add_action( 'phpmailer_init', 'wplitefeat_phpmailer_smtp' );
+function wplitefeat( $phpmailer ) {
+    $phpmailer->isSMTP();     
+    $phpmailer->Host = 'mail.google.com';  
+    $phpmailer->SMTPAuth = true;
+    $phpmailer->Port = 25;
+    $phpmailer->Username = 'aamir.2k18@gmail.com';
+    $phpmailer->Password = '2k18pass';
+    // $phpmailer->SMTPSecure = SMTP_SECURE;
+    $phpmailer->From = 'admin@site';
+    $phpmailer->FromName = 'Admin';
+}
+////////////////////////////
+add_action('wp_ajax_register_user', 'register_user');
+add_action('wp_ajax_nopriv_register_user', 'register_user');
+function register_user()
+{
+    $id_check = false;
+    $user_id = wp_create_user($_REQUEST['first_name'], $_REQUEST['last_name'], $_REQUEST['email']);
+    if ($user_id) {
+        $id_check = true;
+    }
 
+    wp_update_user(
+        array(
+            'ID' => $user_id,
+            'nickname' => $_REQUEST['first_name'],
+        )
+    );
+    update_user_meta($user_id, 'name', $_REQUEST['first_name'] . ' ' . $_REQUEST['last_name']);
+    update_user_meta($user_id, 'display_name', $_REQUEST['first_name']);
+
+    $firstname = $_REQUEST['first_name'];
+    $lastname = $_REQUEST['last_name'];
+    update_user_meta($user_id, 'first_name', $firstname);
+    update_user_meta($user_id, 'last_name', $lastname);
+    wp_set_password($user_password, $user_id);
+
+    update_user_meta($user_id, 'wp_user_level', 0);
+    $user = new WP_User($user_id);
+    $user->add_role('subscriber');//CHANGE THIS VIA $OPTIONS
+
+    $status = 1;
+    $message = "Thanks for registring with us, please check your inbox.";
+    $email_msg = "Thank you for registering with Us. Your Password is: $user_password.<br/><br/>For further queries please contact us @ ".get_bloginfo( 'admin_email' ).". <br/><br/>Thanks.";
+    wp_mail($_REQUEST['email'], $message, $email_msg, '','');
+
+    $return = json_encode(array('request' => $_REQUEST, 'status' => $status, 'message' => $message));
+    echo $return;
+    exit;
+}
 /** 2. Login
  * **/
 /** 3. Email Verification
