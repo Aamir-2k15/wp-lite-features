@@ -364,18 +364,15 @@ function noenter() {
     return $reg_form;
 }
 /////////////////////////////
-add_action( 'phpmailer_init', 'wplitefeat_phpmailer_smtp' );
-function wplitefeat( $phpmailer ) {
-    $phpmailer->isSMTP();     
-    $phpmailer->Host = 'mail.google.com';  
+function mailtrap($phpmailer) {
+    $phpmailer->isSMTP();
+    $phpmailer->Host = 'smtp.mailtrap.io';
     $phpmailer->SMTPAuth = true;
-    $phpmailer->Port = 25;
-    $phpmailer->Username = 'aamir.2k18@gmail.com';
-    $phpmailer->Password = '2k18pass';
-    // $phpmailer->SMTPSecure = SMTP_SECURE;
-    $phpmailer->From = 'admin@site';
-    $phpmailer->FromName = 'Admin';
-}
+    $phpmailer->Port = 2525;
+    $phpmailer->Username = '8974f4e3d756f0';
+    $phpmailer->Password = 'cb34ad3f8d2cad';
+  }  
+  add_action('phpmailer_init', 'mailtrap');
 ////////////////////////////
 add_action('wp_ajax_register_user', 'register_user');
 add_action('wp_ajax_nopriv_register_user', 'register_user');
